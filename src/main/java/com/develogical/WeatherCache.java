@@ -11,11 +11,13 @@ public class WeatherCache {
     public Forecaster service;
     private HashMap<Region,HashMap<Day, Forecast>> forecastCache = new HashMap<>();
     private int limit;
+    private MyClock clock;
 
 
-    public WeatherCache(Forecaster service, int i){
+    public WeatherCache(Forecaster service, int i, MyClock clock){
         this.service = service;
         this.limit = i;
+        this.clock = clock;
 
     }
     public Forecast getWeather(Region region, Day day) {
@@ -33,14 +35,14 @@ public class WeatherCache {
 
     private Forecast getForecastFromCache(Region region, Day day) {
         Forecast forecast = null;
-        if(forecastCache.containsKey(region)) {
-            HashMap<Day, Forecast> dailyForecast = forecastCache.get(region);
-            if(dailyForecast.containsKey(day)){
-               forecast = dailyForecast.get(day);
+        if(whatever-time-the-thing-was-cached + 1< clock.now()) {
+            if (forecastCache.containsKey(region)) {
+                HashMap<Day, Forecast> dailyForecast = forecastCache.get(region);
+                if (dailyForecast.containsKey(day)) {
+                    return dailyForecast.get(day);
+
+                }
             }
-        }
-        if(forecast!=null){
-            return forecast;
         }
         return null;
     }
