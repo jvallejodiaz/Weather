@@ -18,7 +18,7 @@ public class WeatherCachingTests {
     @Test
     public void checkRequestsDataFromWeathersystem() throws Exception {
         Forecaster delegate = mock(Forecaster.class);
-        when(delegate.forecastFor(Region.BIRMINGHAM, Day.FRIDAY))
+        when(delegate.forecastFor(any(Region.class), any(Day.class)))
                 .thenReturn(new Forecast("Sunny", 22));
         WeatherCache cache = new WeatherCache(delegate, 3, new RealClock());
 
@@ -30,7 +30,7 @@ public class WeatherCachingTests {
     @Test
     public void checkRequestsDataFromWeatherSystemIsCalledOnce() throws Exception {
         Forecaster delegate = mock(Forecaster.class);
-        when(delegate.forecastFor(Region.BIRMINGHAM, Day.FRIDAY))
+        when(delegate.forecastFor(any(Region.class), any(Day.class)))
                 .thenReturn(new Forecast("Sunny", 22));
 
         WeatherCache cache = new WeatherCache(delegate, 3, new RealClock());
@@ -44,9 +44,9 @@ public class WeatherCachingTests {
     }
 
     @Test
-    public void checkRequestsDataFromWeatherSystemIsCalledOnceLondon() throws Exception {
+    public void checkThatForecastIsNotCachedAlways() throws Exception {
         Forecaster delegate = mock(Forecaster.class);
-        when(delegate.forecastFor(Region.BIRMINGHAM, Day.FRIDAY))
+        when(delegate.forecastFor(any(Region.class), any(Day.class)))
                 .thenReturn(new Forecast("Sunny", 22));
         WeatherCache cache = new WeatherCache(delegate, 3, new RealClock());
 
@@ -59,7 +59,7 @@ public class WeatherCachingTests {
     }
 
     @Test
-    public void checkRequestsDataFromWeatherSystemIsCalledOnceDifferentDays() throws Exception {
+    public void checkThatForcastForDifferentDaysIsCached() throws Exception {
         Forecaster delegate = mock(Forecaster.class);
         when(delegate.forecastFor(Region.BIRMINGHAM, Day.FRIDAY))
                 .thenReturn(new Forecast("Sunny", 22));
@@ -67,6 +67,7 @@ public class WeatherCachingTests {
         WeatherCache cache = new WeatherCache(delegate, 3, new RealClock());
 
         cache.getWeather(Region.BIRMINGHAM, Day.SATURDAY);
+        cache.getWeather(Region.BIRMINGHAM, Day.FRIDAY);
         Forecast data = cache.getWeather(Region.BIRMINGHAM, Day.FRIDAY);
         assertThat(data.summary(), equalTo("Sunny"));
         assertThat(data.temperature(), equalTo(22));

@@ -30,16 +30,14 @@ public class WeatherCache {
     }
 
     private CachedForecast getForecastFromCache(Region region, Day day) {
-        CachedForecast forecast = null;
-
             if (forecastCache.containsKey(region)) {
-                HashMap<Day, CachedForecast> dailyForecast = forecastCache.get(region);
-                if (dailyForecast.containsKey(day)) {
-                    CachedForecast currentForecast = dailyForecast.get(day);
-                    if(currentForecast.getTimeStamp() > clock.now()){
-                        dailyForecast.remove(day);
+                HashMap<Day, CachedForecast> regionMap = forecastCache.get(region);
+                if (regionMap.containsKey(day)) {
+                    CachedForecast forecastDay = regionMap.get(day);
+                    if(forecastDay.getTimeStamp() > clock.now()){
+                        regionMap.remove(day);
                     }else{
-                        return currentForecast;
+                        return forecastDay;
                     }
                 }
             }
