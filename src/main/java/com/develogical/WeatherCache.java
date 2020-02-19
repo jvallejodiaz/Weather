@@ -7,7 +7,7 @@ import com.weather.Region;
 
 import java.util.HashMap;
 
-public class WeatherCache {
+public class WeatherCache implements WeatherService {
     public Forecaster service;
     private HashMap<Region,HashMap<Day, CachedForecast>> forecastCache = new HashMap<>();
     private int limit;
@@ -18,15 +18,14 @@ public class WeatherCache {
         this.service = service;
         this.limit = i;
         this.clock = clock;
-
     }
+
     public Forecast getWeather(Region region, Day day) {
         CachedForecast cachedForecast = getForecastFromCache(region, day);
         if (cachedForecast != null) return cachedForecast.forecast;
         CachedForecast myForecast = new CachedForecast(this.service.forecastFor(region, day), new MyTimeStamp());
         updateCache(region, day, myForecast);
         return myForecast.forecast;
-
     }
 
     private CachedForecast getForecastFromCache(Region region, Day day) {
