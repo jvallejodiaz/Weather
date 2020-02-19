@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 public class WeatherCache {
     public Forecaster service;
-    private HashMap<Region,HashMap<Day, Forecast>> forecastCache = new HashMap<>();
+    private HashMap<Region,HashMap<Day, CachedForecast>> forecastCache = new HashMap<>();
     private int limit;
     private MyClock clock;
 
@@ -21,23 +21,25 @@ public class WeatherCache {
 
     }
     public Forecast getWeather(Region region, Day day) {
-        Forecast forecast = getForecastFromCache(region, day);
+        CachedForecast cachedForecast = getForecastFromCache(region, day);
 
-        if (forecast != null) return forecast;
+        if (cachedForecast != null) return cachedForecast.forecast;
 
-        forecast = this.service.forecastFor(region, day);
+        Forecast forecast = this.service.forecastFor(region, day);
 
-        updateCache(region, day, forecast);
+        CachedForecast myForecast = new CachedForecast(forecast, clock);
 
-        return forecast;
+        updateCache(region, day, myForecast);
+
+        return myForecast.forecast;
 
     }
 
-    private Forecast getForecastFromCache(Region region, Day day) {
-        Forecast forecast = null;
-        if(whatever-time-the-thing-was-cached + 1< clock.now()) {
+    private CachedForecast getForecastFromCache(Region region, Day day) {
+        CachedForecast forecast = null;
+        if(2L + 1< clock.now()) {
             if (forecastCache.containsKey(region)) {
-                HashMap<Day, Forecast> dailyForecast = forecastCache.get(region);
+                HashMap<Day, CachedForecast> dailyForecast = forecastCache.get(region);
                 if (dailyForecast.containsKey(day)) {
                     return dailyForecast.get(day);
 
@@ -47,11 +49,11 @@ public class WeatherCache {
         return null;
     }
 
-    private void updateCache(Region region, Day day, Forecast forecast) {
+    private void updateCache(Region region, Day day, CachedForecast forecast) {
         if(forecastCache.size() == limit){
             forecastCache.clear();
         }
-        forecastCache.put(region, new HashMap<Day, Forecast>());
+        forecastCache.put(region, new HashMap<Day, CachedForecast>());
         forecastCache.get(region).put(day, forecast);
     }
 }
