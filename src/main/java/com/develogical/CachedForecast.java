@@ -11,4 +11,8 @@ public class CachedForecast {
         this.forecast = forecast;
         this.clock = clock;
     }
+    public long getTimeStamp(){
+        return clock.now();
+    }
+
 }

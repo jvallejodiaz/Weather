@@ -32,6 +32,7 @@ public class WeatherCachingTests {
         Forecaster delegate = mock(Forecaster.class);
         when(delegate.forecastFor(Region.BIRMINGHAM, Day.FRIDAY))
                 .thenReturn(new Forecast("Sunny", 22));
+
         WeatherCache cache = new WeatherCache(delegate, 3, new RealClock());
 
         cache.getWeather(Region.BIRMINGHAM, Day.FRIDAY);
@@ -98,7 +99,7 @@ public class WeatherCachingTests {
                 .thenReturn(new Forecast("Sunny", 22));
 
         MyClock fakeDate = mock(MyClock.class);
-        when(fakeDate.now()).thenReturn(1L);
+        when(fakeDate.now()).thenReturn(System.currentTimeMillis() - 60*60*1000L);
 
         WeatherCache cache = new WeatherCache(delegate, 2, fakeDate);
 
@@ -109,5 +110,22 @@ public class WeatherCachingTests {
         verify(delegate, times(2)).forecastFor(Region.EDINBURGH, Day.FRIDAY);
     }
 
+    @Test
+    public void checkThatCacheClearsAfterSomethingDifferentToAHour(){
+        Forecaster delegate = mock(Forecaster.class);
+        when(delegate.forecastFor(any(Region.class), any(Day.class)))
+                .thenReturn(new Forecast("Sunny", 22));
+
+        MyClock fakeDate = mock(MyClock.class);
+        when(fakeDate.now()).thenReturn(System.currentTimeMillis() - 3*60*60*1000L);
+
+        WeatherCache cache = new WeatherCache(delegate, 2, fakeDate);
+
+        cache.getWeather(Region.EDINBURGH, Day.FRIDAY);
+        Forecast data = cache.getWeather(Region.EDINBURGH, Day.FRIDAY);
+        assertThat(data.summary(), equalTo("Sunny"));
+        assertThat(data.temperature(), equalTo(22));
+        verify(delegate, times(2)).forecastFor(Region.EDINBURGH, Day.FRIDAY);
+    }
 
 }

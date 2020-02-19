@@ -22,30 +22,27 @@ public class WeatherCache {
     }
     public Forecast getWeather(Region region, Day day) {
         CachedForecast cachedForecast = getForecastFromCache(region, day);
-
         if (cachedForecast != null) return cachedForecast.forecast;
-
-        Forecast forecast = this.service.forecastFor(region, day);
-
-        CachedForecast myForecast = new CachedForecast(forecast, clock);
-
+        CachedForecast myForecast = new CachedForecast(this.service.forecastFor(region, day), new MyTimeStamp());
         updateCache(region, day, myForecast);
-
         return myForecast.forecast;
 
     }
 
     private CachedForecast getForecastFromCache(Region region, Day day) {
         CachedForecast forecast = null;
-        if(2L + 1< clock.now()) {
+
             if (forecastCache.containsKey(region)) {
                 HashMap<Day, CachedForecast> dailyForecast = forecastCache.get(region);
                 if (dailyForecast.containsKey(day)) {
-                    return dailyForecast.get(day);
-
+                    CachedForecast currentForecast = dailyForecast.get(day);
+                    if(currentForecast.getTimeStamp() > clock.now()){
+                        dailyForecast.remove(day);
+                    }else{
+                        return currentForecast;
+                    }
                 }
             }
-        }
         return null;
     }
 
