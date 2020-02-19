@@ -18,14 +18,16 @@ public class WeatherCache implements WeatherService {
         this.service = service;
         this.limit = i;
         this.clock = clock;
-    }
 
+    }
     public Forecast getWeather(Region region, Day day) {
-        CachedForecast cachedForecast = getForecastFromCache(region, day);
-        if (cachedForecast != null) return cachedForecast.forecast;
-        CachedForecast myForecast = new CachedForecast(this.service.forecastFor(region, day), new MyTimeStamp());
-        updateCache(region, day, myForecast);
-        return myForecast.forecast;
+        CachedForecast result = getForecastFromCache(region, day);
+        if (result == null) {
+            result = new CachedForecast(this.service.forecastFor(region, day), new MyTimeStamp());
+            updateCache(region, day, result);
+        }
+        return result.getForecast();
+
     }
 
     private CachedForecast getForecastFromCache(Region region, Day day) {

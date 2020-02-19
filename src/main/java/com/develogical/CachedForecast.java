@@ -2,9 +2,9 @@ package com.develogical;
 
 import com.weather.Forecast;
 
-public class CachedForecast {
+class CachedForecast implements ForecastAddapter {
 
-    public   Forecast forecast;
+    private Forecast forecast;
     private  MyClock clock;
 
     public CachedForecast(Forecast forecast, MyClock clock) {
@@ -15,4 +15,8 @@ public class CachedForecast {
         return clock.now();
     }
 
+    @Override
+    public Forecast getForecast() {
+        return forecast;
+    }
 }
